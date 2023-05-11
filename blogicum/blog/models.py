@@ -1,7 +1,7 @@
-from django.db import models
-from django.urls import reverse
 from core.models import PublishedModel
 from django.contrib.auth import get_user_model
+from django.db import models
+from django.urls import reverse
 
 User = get_user_model()
 
@@ -76,7 +76,7 @@ class Post(PublishedModel):
     class Meta:
         verbose_name = 'публикация'
         verbose_name_plural = 'Публикации'
-        ordering = ('created_at',)
+        ordering = ('-created_at',)
 
     def get_absolute_url(self):
         return reverse('blog:profile', kwargs={'name': self.author})
