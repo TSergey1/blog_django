@@ -23,7 +23,7 @@ def post_annotate(query):
     """Подсчет комментариев"""
     return query.annotate(
         comment_count=Count('comment')
-        ).order_by("-pub_date")
+    ).order_by('-pub_date')
 
 
 class PostMixin:
@@ -141,7 +141,7 @@ class PostUpdateView(LoginRequiredMixin, PostMixin, UpdateView):
         return reverse_lazy(
             'blog:post_detail',
             kwargs={'pk': self.kwargs['pk']}
-            )
+        )
 
 
 class PostDeleteView(LoginRequiredMixin, DeleteView):
@@ -228,7 +228,7 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
     def get_success_url(self):
         return reverse(
             'blog:post_detail', kwargs={'pk': self.kwargs['pk']}
-            )
+        )
 
 
 class CommentUpdateView(LoginRequiredMixin,
