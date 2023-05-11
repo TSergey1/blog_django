@@ -19,6 +19,44 @@ def post_query():
     )
 
 
+def post_annotate(query):
+    """Подсчет комментариев"""
+    return query.annotate(
+        comment_count=Count('comment')
+        ).order_by("-pub_date")
+
+
+class PostMixin:
+    """PostMixin"""
+    model = Post
+    form_class = BlogForm
+    template_name = 'blog/create.html'
+
+
+class CommentMixin:
+    """Mixin"""
+    model = Comment
+    template_name = 'blog/comment.html'
+    pk_url_kwarg = 'comment_id'
+
+
+class CommentDefMixin:
+    """DefMixin"""
+    def dispatch(self, request, *args, **kwargs):
+        """Переопределяем dispatch для проверки авторства"""
+        get_object_or_404(Comment,
+                          pk=kwargs['comment_id'])
+        if self.get_object().author != request.user:
+            return redirect('blog:post_detail', pk=self.kwargs['post_id'])
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_success_url(self, **kwargs):
+        return reverse_lazy(
+            'blog:post_detail',
+            kwargs={'pk': self.kwargs['post_id']}
+        )
+
+
 class BlogListView(ListView):
     """Выводит главную страницу index.html (список постов)"""
     model = Post
@@ -28,9 +66,7 @@ class BlogListView(ListView):
         'location',
         'author'
     )
-    queryset = query.annotate(
-        comment_count=Count('comment')
-        ).order_by('-pub_date')
+    queryset = post_annotate(query)
     paginate_by = 10
 
 
@@ -65,10 +101,7 @@ class СategoryListView(ListView):
             pub_date__lte=timezone.now(),
             is_published=True,
         )
-        queryset = query.annotate(
-            comment_count=Count('comment')
-        ).order_by('-pub_date')
-        return queryset
+        return post_annotate(query)
 
     def get_context_data(self, **kwargs):
         """Переопределяем get_context_data для расширения context"""
@@ -85,11 +118,8 @@ class СategoryListView(ListView):
         return context
 
 
-class PostCreateView(LoginRequiredMixin, CreateView):
+class PostCreateView(LoginRequiredMixin, PostMixin, CreateView):
     """Создание новой публикации"""
-    model = Post
-    form_class = BlogForm
-    template_name = 'blog/create.html'
 
     def form_valid(self, form):
         """Переопределяем form_valid для добавления author"""
@@ -97,11 +127,8 @@ class PostCreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-class PostUpdateView(LoginRequiredMixin, UpdateView):
+class PostUpdateView(LoginRequiredMixin, PostMixin, UpdateView):
     """Редактируем публикацию"""
-    model = Post
-    form_class = BlogForm
-    template_name = 'blog/create.html'
 
     def dispatch(self, request, *args, **kwargs):
         """Переопределяем dispatch для проверки авторства"""
@@ -155,10 +182,7 @@ class ProfileListView(ListView):
             ).filter(
                 author__username=self.kwargs['name'],
             )
-        queryset = query.annotate(
-            comment_count=Count('comment', distinct=True)
-            ).order_by('-pub_date')
-        return queryset
+        return post_annotate(query)
 
     def get_context_data(self, **kwargs):
         """Переопределяем get_context_data для расширения context"""
@@ -207,20 +231,12 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
             )
 
 
-class CommentUpdateView(LoginRequiredMixin, UpdateView):
+class CommentUpdateView(LoginRequiredMixin,
+                        CommentMixin,
+                        CommentDefMixin,
+                        UpdateView):
     """Редактируем комментария"""
-    model = Comment
     form_class = CommentForm
-    template_name = 'blog/comment.html'
-    pk_url_kwarg = 'comment_id'
-
-    def dispatch(self, request, *args, **kwargs):
-        """Переопределяем dispatch для проверки авторства"""
-        get_object_or_404(Comment,
-                          pk=kwargs['comment_id'])
-        if self.get_object().author != request.user:
-            return redirect('blog:post_detail', pk=self.kwargs['post_id'])
-        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         """Переопределяем get_context_data для расширения context"""
@@ -228,29 +244,10 @@ class CommentUpdateView(LoginRequiredMixin, UpdateView):
         context['post'] = Post.objects.get(pk=self.kwargs['post_id'])
         return context
 
-    def get_success_url(self, **kwargs):
-        return reverse(
-            'blog:post_detail',
-            kwargs={'pk': self.kwargs['post_id']}
-            )
 
-
-class CommentDeleteView(LoginRequiredMixin, DeleteView):
+class CommentDeleteView(LoginRequiredMixin,
+                        CommentMixin,
+                        CommentDefMixin,
+                        DeleteView):
     """Удаляем комментарий"""
-    model = Comment
-    template_name = 'blog/comment.html'
-    pk_url_kwarg = 'comment_id'
-
-    def dispatch(self, request, *args, **kwargs):
-        """Переопределяем dispatch для проверки авторства"""
-        get_object_or_404(Comment,
-                          pk=kwargs['comment_id'])
-        if self.get_object().author != request.user:
-            return redirect('blog:post_detail', pk=self.kwargs['post_id'])
-        return super().dispatch(request, *args, **kwargs)
-
-    def get_success_url(self, **kwargs):
-        return reverse_lazy(
-            'blog:post_detail',
-            kwargs={'pk': self.kwargs['post_id']}
-            )
+    pass
