@@ -1,19 +1,20 @@
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
+from abc import abstractmethod, ABC
 from functools import partial
 from http import HTTPStatus
-from typing import (Any, Callable, Dict, Iterable, List, Optional, Sequence,
-                    Set, Tuple, Type)
+from typing import (
+    Set, Tuple, Type, Sequence, Callable, Optional, Dict, Iterable, Any, List)
 
 import bs4
 import django.test
-from conftest import (ItemCreatedException, ItemNotCreatedException,
-                      restore_cleaned_data)
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db.models import Model, QuerySet
 from django.forms import BaseForm
 from django.http import HttpResponse
+
+from conftest import (
+    ItemCreatedException, ItemNotCreatedException, restore_cleaned_data)
 from fixtures.types import ModelAdapterT
 from form.base_tester import BaseTester
 

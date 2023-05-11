@@ -2,12 +2,13 @@ from inspect import isclass
 from typing import Type
 
 import pytest
-from adapters.student_adapter import StudentModelAdapter
-from blog.models import Post
-from conftest import COMMENT_TEXT_DISPLAY_LEN_FOR_TESTS
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.db.models import Model
+
+from adapters.student_adapter import StudentModelAdapter
+from blog.models import Post
+from conftest import COMMENT_TEXT_DISPLAY_LEN_FOR_TESTS
 from fixtures.types import CommentModelAdapterT
 
 
@@ -64,7 +65,7 @@ def CommentModelAdapter(CommentModel: type) -> CommentModelAdapterT:
                 return 'text'
             else:
                 return self.text[
-                       :COMMENT_TEXT_DISPLAY_LEN_FOR_TESTS].replace('\n', '')
+                       :COMMENT_TEXT_DISPLAY_LEN_FOR_TESTS].split('\n')[0]
 
     # checking expected fields exist
     _comment_model_cls_adapter = _CommentModelAdapter(CommentModel)

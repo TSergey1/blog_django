@@ -1,15 +1,16 @@
 import datetime
 import random
 from http import HTTPStatus
-from typing import Any, Tuple, Type
+from typing import Tuple, Any, Type
 
 import django.test.client
 import pytest
 import pytz
-from conftest import KeyVal, _TestModelAttrs, get_a_post_get_response_safely
-from django.db.models import DateTimeField, ForeignKey, Model, TextField
+from django.db.models import TextField, DateTimeField, ForeignKey, Model
 from django.forms import BaseForm
 from django.utils import timezone
+
+from conftest import _TestModelAttrs, KeyVal, get_a_post_get_response_safely
 from fixtures.types import CommentModelAdapterT
 from form.base_form_tester import FormValidationException
 from form.comment.create_form_tester import CreateCommentFormTester
@@ -100,10 +101,13 @@ def test_comment(
     content = response_on_created.content.decode(encoding='utf8')
     creation_tester.test_creation_response(content, created_items)
 
-    assert str(len(created_items)) in content, (
-        f'Убедитесь, что {creation_tester.on_which_page} '
-        'корректно отображается количество комментариев.'
-    )
+    index_content = user_client.get('/').content.decode('utf-8')
+    if f'({len(created_items)})' not in index_content:
+        raise AssertionError(
+            f'Убедитесь, что у публикаций на главной странице '
+            'отображается количество комментариев. '
+            'Оно должно быть указано в круглых скобках.'
+        )
 
     created_item_adapters = [CommentModelAdapter(i) for i in created_items]
 

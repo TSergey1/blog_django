@@ -76,7 +76,7 @@ class Post(PublishedModel):
     class Meta:
         verbose_name = 'публикация'
         verbose_name_plural = 'Публикации'
-        ordering = ('-created_at',)
+        ordering = ('-pub_date',)
 
     def get_absolute_url(self):
         return reverse('blog:profile', kwargs={'name': self.author})
@@ -96,7 +96,7 @@ class Comment(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
 
     class Meta:
-        ordering = ('-created_at',)
+        ordering = ('created_at',)
 
     def get_absolute_url(self):
         return reverse('post_detail', kwargs={'pk': self.post})
