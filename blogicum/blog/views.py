@@ -85,7 +85,7 @@ class PostDetailView(DetailView):
         return context
 
 
-class СategoryListView(ListView):
+class CategoryListView(ListView):
     """Выводит страницу категорий"""
     model = Post
     template_name = 'blog/category.html'
