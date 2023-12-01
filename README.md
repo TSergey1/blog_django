@@ -1,11 +1,12 @@
-# Blogicum
+# Blog
+
+[![License MIT](https://img.shields.io/badge/licence-MIT-green)](https://opensource.org/license/mit/)
+[![Python](https://img.shields.io/badge/-Python-464646?style=flat-square&logo=Python)](https://www.python.org/)
+[![Django](https://img.shields.io/badge/-Django-464646?style=flat-square&logo=Django)](https://www.djangoproject.com/)
+[![SQLite](https://img.shields.io/badge/-SQLite-464646?style=flat-square&logo=SQLite)](https://www.sqlite.org/index.html)
 
 ## Информация о проекте
-Началная версия проекта социальной сети для публикации личных дневников. Создана структура БД.
-В дальнейшем это будет сайт, на котором пользователь может создать свою страницу и публиковать на ней сообщения («посты»). 
-Суперпользователь:
-Логин: tyrtychnyy_s
-Пароль: ODK85yAvb
+Небольшая социальная сеть для публикации личных блогов. На сайте пользователь может авторизоваться и публиковать свои посты.
 
 
 
